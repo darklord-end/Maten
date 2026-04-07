@@ -3,12 +3,15 @@ from pyrogram.raw.functions.channels import ToggleForum, CreateChannel
 from pyrogram.raw.functions.messages import CreateForumTopic
 from db import Database
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 db = Database()
 
 async def create_group(client):
     if db.get("main", "group_id") is not None:
-        print("Группа уже существует. ID:", db.get("main", "group_id"))
+        logger.info("Группа уже существует. ID:", db.get("main", "group_id"))
         return
     channel = await client.invoke(
         CreateChannel(

@@ -3,6 +3,10 @@ from colorama import Fore, Style, init
 from pyrogram import Client
 #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
 import utils
+import logging
+import loggering
+
+logger = logging.getLogger(__name__)
 
 uvloop.install()
 config = open("config.ini", "r").read().split("\n")
@@ -51,6 +55,7 @@ started = False
 async def on_first_message(client, message):
     global started
     if not started:
+        logger.info("test")
         started = True
         await client.send_message("me", "Maten запущен!")
         print(app)
@@ -59,6 +64,9 @@ async def on_first_message(client, message):
 if __name__ == "__main__":
     try:
         print(Fore.GREEN + f"[+] Maten запущен.")
+        loggering.load(app)
+        logger.setLevel(logging.INFO)
+        logger.addHandler(loggering.loggerhandler())
         app.run()
     except Exception as e:
         print(Fore.RED + f"[!] Maten не запущен. Ошибка: {e}")
