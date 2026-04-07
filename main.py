@@ -1,30 +1,33 @@
-from pyrogram import Client, errors
-import time, asyncio, sys
-#import logging
+import uvloop, time
+from colorama import Fore, Style, init
+from pyrogram import Client
+#TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
 
-#logging.basicConfig(level=logging.INFO)
+uvloop.install()
 
 app = Client("my_account", plugins=dict(root="modules"))
-app.pending_pkg = {} 
 
-# ПЕРЕПИСАТЬ (ИИ-СЛОП)
+# тест
+class LoaderMod:
+    modules = {}
+    aliases = {}
 
-original_join = app.join_chat
+    @classmethod
+    def add_module(cls, name, func):
+        cls.modules[name] = func
+        print(Fore.GREEN + f"[*] Модуль {name} добавлен.")
 
-async def protected_join(chat_id):
-    print(f"[-] Блокировка попытки входа в канал: {chat_id}")
-    return None
+class Database:
+    "TODO"
 
-app.join_chat = protected_join 
+class Basic:
+    "TODO"
 
-async def safe_edit(message, text):
+init(autoreset=True)
+
+if __name__ == "__main__":
     try:
-        await message.edit(text)
-        await asyncio.sleep(0.3) # Защитная пауза между действиями
+        print(Fore.GREEN + f"[+] Maten запущен.")
+        app.run()
     except Exception as e:
-        print(f"[!] Ошибка флуда: {e}")
-
-
-print("[+] Maten запущен...")
-
-app.run()
+        print(Fore.RED + f"[!] Maten не запущен. Ошибка: {e}")
