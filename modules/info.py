@@ -6,7 +6,7 @@ class Info:
     def register_handlers(app, prefix):
         @app.on_message(filters.command("info", prefixes=prefix) & filters.me)
         async def information_handler(client, message):
-            photo_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3DS4NNjOyOHSXCO5WeN7FWaf6vrpWE1mhKw&s" 
+            photo_url = "https://github.com/darklord-end/Maten/blob/main/images/Info.png?raw=true" 
             
             await message.delete()
             

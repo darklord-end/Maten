@@ -13,7 +13,7 @@ uvloop.install()
 config = open("config.ini", "r").read().split("\n")
 api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
-app = Client("maten", api_id=api_id, api_hash=api_hash)
+app = Client("my_account", api_id=api_id, api_hash=api_hash)
 
 def check_for_updates():
     try:
