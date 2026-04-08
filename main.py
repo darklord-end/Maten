@@ -3,6 +3,7 @@ import uvloop, time
 from colorama import Fore, Style, init
 from git import Repo
 from pyrogram import Client
+from aiogram import Bot, Dispatcher
 #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
 import utils
 import logging
@@ -12,10 +13,15 @@ import os
 logger = logging.getLogger(__name__)
 
 uvloop.install()
+from aiogram.types import Message as AiogramMessage
 config = open("config.ini", "r").read().split("\n")
 api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
+bot_token = config[3].split(" = ")[1]
 app = Client("maten", api_id=api_id, api_hash=api_hash)
+
+bot = Bot(token=bot_token)
+dp = Dispatcher()
 
 def check_for_updates():
     try:
@@ -97,8 +103,16 @@ async def on_first_message(client, message):
     global started
     if not started:
         started = True
-        await client.send_message("me", "[+] Maten запущен!")
         print(app)
+        asyncio.create_task(dp.start_polling(bot))      
+        me = await client.get_me()
+        my_id = me.id
+        try:
+            await bot.send_message(my_id, "[+] **Maten** запущен")
+        except Exception as e:
+            print(Fore.RED + f"[!] Бот не смог отправить уведомление: {e}")
+            print(Fore.YELLOW + "[!] Убедись, что ты запустил бота кнопкой /start в его чате.")     
+        print("[*] Aiogram запущен")
         await utils.create_group(app)
 
 def restart():
