@@ -48,7 +48,11 @@ class LoaderMod:
         import os
         from utils.config import config
         pref = config.prefix
-        for file in os.listdir("modules"):
+        try:
+            modules_list = os.listdir("modules") + os.listdir("loaded")
+        except:
+            modules_list = os.listdir("modules")
+        for file in modules_list:
             if file.endswith(".py") and file != "__init__.py":
                 module_name = file[:-3]
                 try:

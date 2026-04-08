@@ -2,6 +2,9 @@
 from pyrogram import Client, filters
 import os
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Modules:
     @staticmethod
@@ -10,12 +13,8 @@ class Modules:
         async def modules_handler(client, message):
             main = sys.modules.get("__main__")
             LoaderMod = getattr(main, "LoaderMod", None)
-
-            if not LoaderMod:
-                await message.edit("📂 **Модули:**\n— *Список недоступен*")
-                return
-
             modules = list(LoaderMod.modules.keys())
+            print(f"Modules: {modules}")
             if len(modules) == 0:
                 await message.edit("📂 **Модули:**\n— *Список пуст*")
                 return
