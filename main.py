@@ -49,10 +49,11 @@ class LoaderMod:
         from utils.config import config
         pref = config.prefix
         try:
-            modules_list = os.listdir("modules") + os.listdir("loaded")
+            modules_list1 = os.listdir("modules")
+            modules_list2 = os.listdir("loaded")
         except:
-            modules_list = os.listdir("modules")
-        for file in modules_list:
+            modules_list1 = os.listdir("modules")
+        for file in modules_list1:
             if file.endswith(".py") and file != "__init__.py":
                 module_name = file[:-3]
                 try:
@@ -63,16 +64,24 @@ class LoaderMod:
                         if hasattr(getattr(module, cls_name), 'register_handlers'):
                             getattr(module, cls_name).register_handlers(app, pref)
                 except Exception as e:
+                    print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
+        if modules_list2:
+            for file in modules_list2:
+                if file.endswith(".py") and file != "__init__.py":
+                    module_name = file[:-3]
+                    print(module_name)
                     try:
                         module = __import__(f"loaded.{module_name}", fromlist=[module_name])
-                        cls_name = module_name.capitalize()
+                        print(module)
+                        cls_name = module_name if module_name[0].isupper() else module_name.capitalize()
+                        print(cls_name)
                         if hasattr(module, cls_name):
                             cls.add_module(getattr(module, cls_name))
+                            print(999)
                             if hasattr(getattr(module, cls_name), 'register_handlers'):
                                 getattr(module, cls_name).register_handlers(app, pref)
                     except Exception as e:
                         print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
-    
 
 class Basic:
     "TODO"
