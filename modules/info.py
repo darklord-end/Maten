@@ -1,5 +1,6 @@
 # Инфо TODO
 from pyrogram import Client, filters
+from utils import *
 
 class Info:
     @staticmethod
@@ -13,7 +14,7 @@ class Info:
             await client.send_photo(
                 chat_id=message.chat.id,
                 photo=photo_url,
-                caption="**Инфо:**\n Maten"
+                caption="**Инфо:**\nMaten\nПлатформа: " + get_platform()
             )
 
         # Help TODO

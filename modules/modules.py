@@ -1,27 +1,28 @@
 # модули
 from pyrogram import Client, filters
 import os
+import sys
 
 class Modules:
     @staticmethod
     def register_handlers(app, prefix):
         @app.on_message(filters.command("modules", prefixes=prefix) & filters.me)
         async def modules_handler(client, message):
-            folder = "modules"
-            
-            if not os.path.exists(folder):
-                await message.edit("❌ **Папка `modules/` не найдена**")
+            main = sys.modules.get("__main__")
+            LoaderMod = getattr(main, "LoaderMod", None)
+
+            if not LoaderMod:
+                await message.edit("📂 **Модули:**\n— *Список недоступен*")
                 return
 
-            modules = [m for m in os.listdir(folder) if not m.startswith(("_", "."))]
-
-            if not modules:
+            modules = list(LoaderMod.modules.keys())
+            if len(modules) == 0:
                 await message.edit("📂 **Модули:**\n— *Список пуст*")
                 return
 
             formatted_list = ""
-            for i, m in enumerate(modules):
-                char = "├──" if i < len(modules) - 1 else "└──"
+            for index, m in enumerate(modules):
+                char = "├──" if index < len(modules) - 1 else "└──"
                 formatted_list += f"\n`{char}` `{m}`"
 
             caption = (

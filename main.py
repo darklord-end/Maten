@@ -1,3 +1,4 @@
+import sys
 import uvloop, time
 from colorama import Fore, Style, init
 from git import Repo
@@ -6,7 +7,8 @@ from pyrogram import Client
 import utils
 import logging
 import loggering
-
+import asyncio
+import os
 logger = logging.getLogger(__name__)
 
 uvloop.install()
@@ -79,6 +81,10 @@ async def on_first_message(client, message):
         print(app)
         await utils.create_group(app)
 
+def restart():
+    print(Fore.YELLOW + "[*] Перезапуск...")
+    os.execv(sys.executable, [sys.executable] + sys.argv)
+
 if __name__ == "__main__":
     check_for_updates()
     try:
@@ -86,6 +92,18 @@ if __name__ == "__main__":
         loggering.load(app)
         logger.setLevel(logging.INFO)
         logger.addHandler(loggering.loggerhandler())
+        try:
+            open("maten.session", "r").close()
+        except FileNotFoundError:
+            import setup
+            print("[!] Сессия не найдена, запускаю мастер настройки...")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                loop.run_until_complete(setup.setup(app))
+            except KeyboardInterrupt:
+                os.remove("maten.session")
+                sys.exit(0)
         app.run()
     except Exception as e:
         print(Fore.RED + f"[!] Maten не запущен. Ошибка: {e}")
