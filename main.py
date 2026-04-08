@@ -1,5 +1,6 @@
 import uvloop, time
 from colorama import Fore, Style, init
+from git import Repo
 from pyrogram import Client
 #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
 import utils
@@ -13,6 +14,21 @@ config = open("config.ini", "r").read().split("\n")
 api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
 app = Client("maten", api_id=api_id, api_hash=api_hash)
+
+def check_for_updates():
+    try:
+        repo = Repo('.')
+        origin = repo.remotes.origin
+        origin.fetch()
+        local_commit = repo.head.commit.hexsha
+        remote_commit = origin.refs.main.commit.hexsha
+        if local_commit != remote_commit:
+            print(Fore.RED + "[!!!] Новые коммиты")
+        else:
+            print(Fore.CYAN + "[*] Нету новых коммитов")
+
+    except Exception as e:
+        print(Fore.RED + f"[!] Ошибка при проверке: {e}")
 
 # тест
 class LoaderMod:
@@ -28,6 +44,8 @@ class LoaderMod:
     @classmethod
     def load_modules(cls, app):
         import os
+        from utils.config import config
+        pref = config.prefix
         for file in os.listdir("modules"):
             if file.endswith(".py") and file != "__init__.py":
                 module_name = file[:-3]
@@ -37,7 +55,7 @@ class LoaderMod:
                     if hasattr(module, cls_name):
                         cls.add_module(getattr(module, cls_name))
                         if hasattr(getattr(module, cls_name), 'register_handlers'):
-                            getattr(module, cls_name).register_handlers(app)
+                            getattr(module, cls_name).register_handlers(app, pref)
                 except Exception as e:
                     print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
     
@@ -57,11 +75,12 @@ async def on_first_message(client, message):
     if not started:
         logger.info("test")
         started = True
-        await client.send_message("me", "Maten запущен!")
+        await client.send_message("me", "[+] Maten запущен!")
         print(app)
         await utils.create_group(app)
 
 if __name__ == "__main__":
+    check_for_updates()
     try:
         print(Fore.GREEN + f"[+] Maten запущен.")
         loggering.load(app)

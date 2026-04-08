@@ -1,10 +1,11 @@
+# Пинг
 import time
 from pyrogram import Client, filters
 
 class Ping:
     @staticmethod
-    def register_handlers(app):
-        @app.on_message(filters.command("ping", prefixes=".") & filters.me)
+    def register_handlers(app, prefix):
+        @app.on_message(filters.command("ping", prefixes=prefix) & filters.me)
         async def ping_handler(client, message):
             print("Ping handler called")  # Отладка
             start_time = time.perf_counter()

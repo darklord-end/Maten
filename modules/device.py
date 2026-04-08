@@ -1,4 +1,4 @@
-# Мне лень доделывать
+# TODO
 from pyrogram import Client, filters
 import platform
 import psutil
@@ -7,8 +7,8 @@ import subprocess
 
 class Device:
     @staticmethod
-    def register_handlers(app):
-        @app.on_message(filters.command("matefetch", prefixes=".") & filters.me)
+    def register_handlers(app, prefix):
+        @app.on_message(filters.command("matefetch", prefixes=prefix) & filters.me)
         async def device_handler(client, message):
             try:
                 os_name = platform.freedesktop_os_release().get('PRETTY_NAME')

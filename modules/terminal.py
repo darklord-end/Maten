@@ -1,10 +1,11 @@
+#Терминал
 from pyrogram import Client, filters
 import subprocess
 
 class Terminal:
     @staticmethod
-    def register_handlers(app):
-        @app.on_message(filters.command("term", prefixes=".") & filters.me)
+    def register_handlers(app, prefix):
+        @app.on_message(filters.command("term", prefixes=prefix) & filters.me)
         async def xz_kak_nazbati(client, message):
             cmd = message.text.split(None, 1)[1]
             result = subprocess.getoutput(cmd)
