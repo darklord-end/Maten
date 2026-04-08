@@ -63,7 +63,15 @@ class LoaderMod:
                         if hasattr(getattr(module, cls_name), 'register_handlers'):
                             getattr(module, cls_name).register_handlers(app, pref)
                 except Exception as e:
-                    print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
+                    try:
+                        module = __import__(f"loaded.{module_name}", fromlist=[module_name])
+                        cls_name = module_name.capitalize()
+                        if hasattr(module, cls_name):
+                            cls.add_module(getattr(module, cls_name))
+                            if hasattr(getattr(module, cls_name), 'register_handlers'):
+                                getattr(module, cls_name).register_handlers(app, pref)
+                    except Exception as e:
+                        print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
     
 
 class Basic:
