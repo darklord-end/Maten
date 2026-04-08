@@ -8,7 +8,7 @@ class Info:
         @app.on_message(filters.command("info", prefixes=prefix) & filters.me)
         async def information_handler(client, message):
             photo_url = "https://github.com/darklord-end/Maten/blob/main/images/Info.png?raw=true" 
-            
+            #TODO - MOVE TO OTHER REPO!
             await message.delete()
             
             await client.send_photo(
