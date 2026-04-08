@@ -75,7 +75,6 @@ started = False
 async def on_first_message(client, message):
     global started
     if not started:
-        logger.info("test")
         started = True
         await client.send_message("me", "[+] Maten запущен!")
         print(app)

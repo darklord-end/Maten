@@ -4,6 +4,7 @@ from db import Database
 db = Database()
 import time
 import asyncio
+import sys
 
 logger = logging.getLogger(__name__)
 config = open("config.ini", "r").read().split("\n")
@@ -63,3 +64,7 @@ class loggerhandler(logging.Handler):
         except Exception as e:
             print(f"Failed to send log: {e}")
             print(f"[LOG] {log_entry}")
+
+def global_exception_handler(exc_type, exc_value, exc_traceback):
+    logger.critical("EXCEPTION:", exc_info=(exc_type, exc_value, exc_traceback))
+sys.excepthook = global_exception_handler
