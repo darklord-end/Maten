@@ -49,6 +49,13 @@ class LoaderMod:
         cls.modules[name] = module_class
         print(Fore.GREEN + f"[*] Модуль {name} добавлен.")
 
+    # ИЗМЕНИТЬ
+    @classmethod
+    def add_aliases(cls, aliases_class):
+        name = aliases_class.__name__
+        cls.alias[name] = aliases_class
+        print(Fore.GREEN + f"[*] Aliases {name} добавлен.")
+
     @classmethod
     def load_modules(cls, app):
         import os
@@ -114,6 +121,7 @@ async def on_first_message(client, message):
             print(Fore.YELLOW + "[!] Убедись, что ты запустил бота кнопкой /start в его чате.")     
         print("[*] Aiogram запущен")
         await utils.create_group(app)
+        await utils.start_automation(app)
 
 def restart():
     print(Fore.YELLOW + "[*] Перезапуск...")

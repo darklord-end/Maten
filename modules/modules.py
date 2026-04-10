@@ -22,11 +22,11 @@ class Modules:
             formatted_list = ""
             for index, m in enumerate(modules):
                 char = "├──" if index < len(modules) - 1 else "└──"
-                formatted_list += f"\n`{char}` `{m}`"
+                formatted_list += f"\n>{char}> >{m}>"
 
             caption = (
                 f"**✨ Список модулей:**\n"
-                f"{formatted_list}"
+                f"{formatted_list}>>"
                 f"\n"
                 f"**Всего:** `{len(modules)}`"
             )
