@@ -14,7 +14,8 @@ class Info:
             await client.send_photo(
                 chat_id=message.chat.id,
                 photo=photo_url,
-                caption="**Инфо:**\nMaten\nПлатформа: " + get_platform()
+                caption="🔍**Maten** "
+                "\n"
             )
 
         # Help TODO

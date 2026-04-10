@@ -4,6 +4,7 @@ from colorama import Fore, Style, init
 from git import Repo
 from pyrogram import Client
 from aiogram import Bot, Dispatcher
+from utils import check_for_updates_aiogram # мне лень чо то там в init.py
 #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
 import utils
 import logging
@@ -23,21 +24,6 @@ app = Client("maten", api_id=api_id, api_hash=api_hash)
 bot = Bot(token=bot_token)
 dp = Dispatcher()
 
-def check_for_updates():
-    try:
-        repo = Repo('.')
-        origin = repo.remotes.origin
-        origin.fetch()
-        local_commit = repo.head.commit.hexsha
-        remote_commit = origin.refs.main.commit.hexsha
-        if local_commit != remote_commit:
-            print(Fore.RED + "[!!!] Новые коммиты")
-        else:
-            print(Fore.CYAN + "[*] Нету новых коммитов")
-
-    except Exception as e:
-        print(Fore.RED + f"[!] Ошибка при проверке: {e}")
-
 # тест
 class LoaderMod:
     modules = {}
@@ -53,7 +39,7 @@ class LoaderMod:
     @classmethod
     def add_aliases(cls, aliases_class):
         name = aliases_class.__name__
-        cls.alias[name] = aliases_class
+        cls.aliases[name] = aliases_class
         print(Fore.GREEN + f"[*] Aliases {name} добавлен.")
 
     @classmethod
@@ -114,21 +100,16 @@ async def on_first_message(client, message):
         asyncio.create_task(dp.start_polling(bot))      
         me = await client.get_me()
         my_id = me.id
-        try:
-            await bot.send_message(my_id, "[+] **Maten** запущен")
-        except Exception as e:
-            print(Fore.RED + f"[!] Бот не смог отправить уведомление: {e}")
-            print(Fore.YELLOW + "[!] Убедись, что ты запустил бота кнопкой /start в его чате.")     
+        await bot.send_message(my_id, "[+] **Maten** запущен")
         print("[*] Aiogram запущен")
         await utils.create_group(app)
-        await utils.start_automation(app)
+        await check_for_updates_aiogram(bot, me.id, dp)  
 
 def restart():
     print(Fore.YELLOW + "[*] Перезапуск...")
     os.execv(sys.executable, [sys.executable] + sys.argv)
 
 if __name__ == "__main__":
-    check_for_updates()
     try:
         print(Fore.GREEN + f"[+] Maten запущен.")
         loggering.load(app)
