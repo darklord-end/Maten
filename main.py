@@ -1,3 +1,4 @@
+    #TODO: Улучшить сам загрузчик. Улучшить модули.
 try:
     import sys
     import uvloop, time
@@ -5,8 +6,8 @@ try:
     from git import Repo
     from pyrogram import Client
     from aiogram import Bot, Dispatcher
-    #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
     import utils
+    from db import Database
     import logging
     import loggering
     import asyncio
@@ -24,6 +25,7 @@ config = open("config.ini", "r").read().split("\n")
 api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
 app = Client("maten", api_id=api_id, api_hash=api_hash)
+db = Database()
 
 # тест
 class LoaderMod:
@@ -107,7 +109,7 @@ async def on_first_message(client, message):
             await utils.start_automation(client)
         finally:
             is_automating = False
-            os.execl(sys.executable, sys.executable, *sys.argv) # Что-бы юб видел токен
+            restart()
 
     if not started and db.get("system", "bot_token"):
         from utils import bot, dp
@@ -117,7 +119,8 @@ async def on_first_message(client, message):
             asyncio.create_task(dp.start_polling(bot))
             print(Fore.GREEN + "[+] Aiogram запущен!")
             me = await client.get_me()
-            await bot.send_message(me.id, "**Maten**")
+            await bot.send_message(me.id, "**Maten**", parse_mode="Markdown")
+            await utils.check_for_updates_aiogram(bot, me.id, dp)
 
 def restart():
     print(Fore.YELLOW + "[*] Перезапуск...")

@@ -8,18 +8,20 @@ import sys
 db = Database()
 session = AiohttpSession()
 bot_token = db.get("system", "bot_token")
+dp = Dispatcher()
 
 if bot_token:
     bot = Bot(token=bot_token)
-    dp = Dispatcher()
 else:
-    dp = None
+    print("[!] Токен не найден в базе данных")
     bot = None
 
 @dp.inline_query()
 async def global_inline_handler(query: types.InlineQuery):
+    if not bot:
+        return
     text = query.query.strip().lower()
-    print(f"DEBUG: Пришел запрос от {query.from_user.username}: {text}")
+    print(f"[*] Пришел запрос от {query.from_user.username}: {text}")
     
     results = []
     
@@ -43,7 +45,7 @@ async def global_inline_handler(query: types.InlineQuery):
                     if mod_res:
                         results.extend(mod_res)
                 except Exception as e:
-                    print(f"DEBUG ERROR in {module_cls.__name__}: {e}")
+                    print(f"[!] ERROR in {module_cls.__name__}: {e}")
 
-    print(f"DEBUG: Отправляю {len(results)} результатов")
+    print(f"[*] Отправляю {len(results)} результатов")
     await query.answer(results, cache_time=2, is_personal=True)

@@ -7,8 +7,10 @@ from colorama import Fore
 
 def get_update_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔄 Обновить", callback_data="start_update", style='success')]
-        [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_update", style='danger')]
+        [
+            InlineKeyboardButton(text="🔄 Обновить", callback_data="start_update", style='success'),
+            InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_update", style='danger')
+        ]
     ])
 
 async def check_for_updates_aiogram(bot, chat_id, dp):
@@ -27,7 +29,7 @@ async def check_for_updates_aiogram(bot, chat_id, dp):
                 f"**Коммит:** `{remote_hash[:7]}`\n"
                 f"**Описание:** `{commit_msg.strip()}`"
             )
-            await bot.send_message(chat_id, text, reply_markup=get_update_kb())
+            await bot.send_message(chat_id, text, reply_markup=get_update_kb(), parse_mode="Markdown")
             
             @dp.callback_query(F.data == "start_update")
             async def process_update(callback: types.CallbackQuery):
