@@ -15,7 +15,7 @@ async def start_automation(app: Client):
     rand_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
     username = f"maten_{rand_str}_bot"
     
-    pic_url = "https://github.com/darklord-end/Maten/blob/main/images/Logo2.png?raw=true"
+    pic_url = "https://github.com/darklord-end/Imagessss/blob/main/Logo2.png?raw=true"
 
     async def send_with_delay(text, delay=2):
         try:
