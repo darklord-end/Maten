@@ -4,9 +4,9 @@ from colorama import Fore, Style, init
 from git import Repo
 from pyrogram import Client
 from aiogram import Bot, Dispatcher
-from utils import check_for_updates_aiogram # мне лень чо то там в init.py
 #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
 import utils
+from utils import start_automation, bot, dp, db, set_owner_id
 import logging
 import loggering
 import asyncio
@@ -18,11 +18,7 @@ from aiogram.types import Message as AiogramMessage
 config = open("config.ini", "r").read().split("\n")
 api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
-bot_token = config[3].split(" = ")[1]
 app = Client("maten", api_id=api_id, api_hash=api_hash)
-
-bot = Bot(token=bot_token)
-dp = Dispatcher()
 
 # тест
 class LoaderMod:
@@ -90,20 +86,33 @@ init(autoreset=True)
 LoaderMod.load_modules(app)
 
 started = False
+is_automating = False
 
 @app.on_message()
 async def on_first_message(client, message):
-    global started
-    if not started:
-        started = True
-        print(app)
-        asyncio.create_task(dp.start_polling(bot))      
-        me = await client.get_me()
-        my_id = me.id
-        await bot.send_message(my_id, "[+] **Maten** запущен")
-        print("[*] Aiogram запущен")
-        await utils.create_group(app)
-        await check_for_updates_aiogram(bot, me.id, dp)  
+    global started, is_automating
+    
+    if started or is_automating:
+        return
+        
+    if not db.get("system", "bot_token"):
+        is_automating = True
+        print(Fore.YELLOW + "[!] Токен не найден.")
+        try:
+            await utils.start_automation(client)
+        finally:
+            is_automating = False
+            os.execl(sys.executable, sys.executable, *sys.argv) # Что-бы юб видел токен
+
+    if not started and db.get("system", "bot_token"):
+        from utils import bot, dp
+        if bot and dp:
+            started = True
+            await utils.users.set_owner_id(client)
+            asyncio.create_task(dp.start_polling(bot))
+            print(Fore.GREEN + "[+] Aiogram запущен!")
+            me = await client.get_me()
+            await bot.send_message(me.id, "**Maten**")
 
 def restart():
     print(Fore.YELLOW + "[*] Перезапуск...")

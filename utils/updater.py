@@ -7,7 +7,8 @@ from colorama import Fore
 
 def get_update_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔄 Обновить Maten", callback_data="start_update")]
+        [InlineKeyboardButton(text="🔄 Обновить", callback_data="start_update", style='success')]
+        [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_update", style='danger')]
     ])
 
 async def check_for_updates_aiogram(bot, chat_id, dp):
@@ -37,7 +38,12 @@ async def check_for_updates_aiogram(bot, chat_id, dp):
                     os.execv(sys.executable, [sys.executable] + sys.argv)
                 except Exception as e:
                     await callback.message.answer(f"❌ Ошибка: {e}")
-            
+
+            @dp.callback_query(F.data == "cancel_update")
+            async def cancelled_update(callback: types.CallbackQuery):
+                callback.message.delete()
+                await callback.answer("Нечего не делаем...")
+
             return True
     except Exception as e:
         print(Fore.RED + f"[!] Ошибка чекера: {e}")
