@@ -6,6 +6,7 @@ try:
     from git import Repo
     from pyrogram import Client
     from aiogram import Bot, Dispatcher
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
     import utils
     from db import Database
     import logging
@@ -26,6 +27,10 @@ api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
 app = Client("maten", api_id=api_id, api_hash=api_hash)
 db = Database()
+
+repo = Repo(".")
+sha = repo.head.object.hexsha
+short_sha = repo.git.rev_parse(sha, short=7)
 
 # тест
 class LoaderMod:
@@ -115,11 +120,37 @@ async def on_first_message(client, message):
         from utils import bot, dp
         if bot and dp:
             started = True
-            await utils.users.set_owner_id(client)
+            if not db.get("system", "owner_id"):
+                await utils.users.set_owner_id(client)
             asyncio.create_task(dp.start_polling(bot))
             print(Fore.GREEN + "[+] Aiogram запущен!")
-            me = await client.get_me()
-            await bot.send_message(me.id, "**Maten**", parse_mode="Markdown")
+        me = await client.get_me()
+        
+        caption = (
+            f"<b>Maten UserBot</b>\n"
+            f"<code>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</code>\n"
+            f"<b>👤 User:</b> <code>{me.first_name}</code>\n"
+            f"<b>🆔 ID:</b> <code>{me.id}</code>\n"
+            f"<b>🛠 Build:</b> <code>#{short_sha}</code>\n"
+        )
+
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="📔 Логи", callback_data="logs", style='primary'), 
+             InlineKeyboardButton(text="⚙️ Настройки", callback_data="settings", style='primary')]
+        ])
+
+        photo_url = "https://github.com/darklord-end/Imagessss/blob/main/omagad.png?raw=true" 
+        try:
+            await bot.send_photo(
+                me.id, 
+                photo=photo_url, 
+                caption=caption, 
+                parse_mode="HTML",
+                reply_markup=kb
+            )
+        except Exception as e:
+            await bot.send_message(me.id, caption, parse_mode="HTML", reply_markup=kb)
+
             await utils.check_for_updates_aiogram(bot, me.id, dp)
 
 def restart():
@@ -128,7 +159,20 @@ def restart():
 
 if __name__ == "__main__":
     try:
+        MATEN_ART = """
+        ███╗   ███╗ █████╗ ████████╗███████╗███╗   ██╗
+        ████╗ ████║██╔══██╗╚══██╔══╝██╔════╝████╗  ██║
+        ██╔████╔██║███████║   ██║   █████╗  ██╔██╗ ██║
+        ██║╚██╔╝██║██╔══██║   ██║   ██╔══╝  ██║╚██╗██║
+        ██║ ╚═╝ ██║██║  ██║   ██║   ███████╗██║ ╚████║
+        ╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═══╝
+        """
+
         print(Fore.GREEN + f"[+] Maten запущен.")
+        print(Fore.GREEN + f"{MATEN_ART}")
+        print(Fore.CYAN + f"• Build: {short_sha}")
+        print(Fore.CYAN + f"• Version: ") # Дообавить потом реальную версию
+        print(Fore.CYAN + f"• Up-to-Date")
         loggering.load(app)
         logger.setLevel(logging.INFO)
         logger.addHandler(loggering.loggerhandler())

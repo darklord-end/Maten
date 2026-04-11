@@ -7,7 +7,6 @@ def get_owner_id():
 
 def is_owner(user_id):
     owner_id = get_owner_id()
-    # Если в базе пусто, на всякий случай пропускаем (или заполни при старте)
     if not owner_id:
         return False
     return int(owner_id) == int(user_id)
