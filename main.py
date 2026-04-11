@@ -153,6 +153,8 @@ async def on_first_message(client, message):
 
             await utils.check_for_updates_aiogram(bot, me.id, dp)
 
+            await utils.check_bot_pfp(bot)
+
 def restart():
     print(Fore.YELLOW + "[*] Перезапуск...")
     os.execv(sys.executable, [sys.executable] + sys.argv)

@@ -3,6 +3,7 @@ import aiohttp
 from db import Database
 from aiogram import Bot, Dispatcher, types
 from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram.types import URLInputFile
 import sys
 
 db = Database()
@@ -15,6 +16,25 @@ if bot_token:
 else:
     print("[!] Токен не найден в базе данных")
     bot = None
+
+# Говно какоето из Bot Api 9.4 
+async def check_bot_pfp(target_bot=None):
+    current_bot = target_bot or bot 
+    if not current_bot: return
+    
+    try:
+        me = await current_bot.get_me()
+        chat = await current_bot.get_chat(me.id)
+        
+        if not chat.photo:
+            print("[*] Авы нет")
+            pfp_url = "https://github.com/darklord-end/Imagessss/blob/main/Logo2.png?raw=true"
+            await bot.set_my_profile_photo(photo=URLInputFile(pfp_url))
+            print("[+] Аватарка поставлена")
+            
+    except Exception as e:
+        print(f"[!] Ошибка pfp: {e}")
+
 
 @dp.inline_query()
 async def global_inline_handler(query: types.InlineQuery):
