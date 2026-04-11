@@ -1,16 +1,21 @@
-import sys
-import uvloop, time
-from colorama import Fore, Style, init
-from git import Repo
-from pyrogram import Client
-from aiogram import Bot, Dispatcher
-#TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
-import utils
-from utils import start_automation, bot, dp, db, set_owner_id
-import logging
-import loggering
-import asyncio
-import os
+try:
+    import sys
+    import uvloop, time
+    from colorama import Fore, Style, init
+    from git import Repo
+    from pyrogram import Client
+    from aiogram import Bot, Dispatcher
+    #TODO: Улучшить сам загрузчик. Добавить Интеграцию Инлайн Бота, улучшить модули.
+    import utils
+    import logging
+    import loggering
+    import asyncio
+    import os
+except ImportError as e:
+    import os
+    print("Detected missing modules, installing requirements...")
+    os.execv(sys.executable, [sys.executable, "-m", "pip", "install", "-r", "requirements.txt", "--break-system-packages"])
+    sys.exit(1)
 logger = logging.getLogger(__name__)
 
 uvloop.install()
