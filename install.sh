@@ -1,57 +1,43 @@
 #!/bin/bash
-# Только для пользователей линукса/хостинга
+
 # Цвета
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${CYAN}--- Maten Userbot Installer ---${NC}"
+echo -e "${CYAN}--- Maten Auto-Installer ---${NC}"
 
-# 1. Проверяем Git
-if ! command -v git &> /dev/null; then
-    echo -e "${RED}[!] Git не установлен. Ставлю...${NC}"
-    # Пытаемся поставить (для Debian/Ubuntu/Arch)
-    sudo apt update && sudo apt install git -y
-fi
-
-# 2. Скачиваем проект, если мы не в нем
 if [ ! -d ".git" ]; then
-    echo -e "[*] Клонирование репозитория Maten..."
+    echo -e "[*] Клонирую Maten..."
     git clone https://github.com/darklord-end/Maten.git
-    cd Maten || exit
-else
-    echo -e "[*] Проект уже скачан, проверяю обновления..."
-    git pull origin main
+    cd Maten || { echo -e "${RED}Ошибка перехода!${NC}"; exit 1; }
 fi
 
-# 3. Ищем Python 3.14
+
 if command -v python3.14 &> /dev/null; then
-    PYTHON_BIN="python3.14"
+    PYTHON_SYS="python3.14"
 else
-    PYTHON_BIN="python3"
-    echo -e "${RED}[!] Использую стандартный python3 (рекомендуется 3.14)${NC}"
+    PYTHON_SYS="python3"
 fi
 
-# 4. Создаем окружение
 if [ ! -d ".venv" ]; then
-    echo -e "[*] Создание окружения .venv..."
-    $PYTHON_BIN -m venv .venv
+    echo -e "[*] Создаю виртуальное окружение..."
+    $PYTHON_SYS -m venv .venv
 fi
+VENV_PYTHON="./.venv/bin/python"
+VENV_PIP="./.venv/bin/pip"
 
-# 5. Ставим зависимости
-echo -e "[*] Установка либ..."
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+echo -e "[*] Обновляю pip и ставлю зависимости..."
+$VENV_PIP install --upgrade pip
+$VENV_PIP install -r requirements.txt
 
-# 6. Запускаем твой setup.py
 if [ -f "setup.py" ]; then
-    echo -e "${GREEN}[+] Запуск настройки базы данных и конфига...${NC}"
-    python setup.py
+    echo -e "${GREEN}[+] Запускаю настройку конфигурации...${NC}"
+    $VENV_PYTHON setup.py
 else
-    echo -e "${RED}[!] setup.py не найден. Создай его для настройки токенов!${NC}"
+    echo -e "${RED}[!] setup.py не найден!${NC}"
 fi
 
-echo -e "\n${GREEN}[✅] Maten готов к работе!${NC}"
-echo -e "Запуск: ${CYAN}source .venv/bin/activate && python main.py${NC}"
+echo -e "\n${GREEN}Всё готово!${NC}"
+echo -e "Для ручного запуска: ${CYAN}source .venv/bin/activate && python main.py${NC}"

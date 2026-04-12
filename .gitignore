@@ -4,7 +4,7 @@ config.ini
 secrets.py
 my_account.session
 downloads/
-loaded/*
+loaded/
 modules/__pycache__
 .venv/
 __pycache__/
