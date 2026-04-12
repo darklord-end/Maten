@@ -50,7 +50,7 @@ class Configure:
             keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
                 [types.InlineKeyboardButton(
                     text="⚙️ Изменить префикс", 
-                    switch_inline_query_current_chat="" # Открывает поле ввода с @bot
+                    switch_inline_query_current_chat=""
                 )],
                 [types.InlineKeyboardButton(text="❌ Закрыть", callback_data="conf_close")]
             ])

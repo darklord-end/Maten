@@ -24,12 +24,20 @@ async def check_for_updates_aiogram(bot, chat_id, dp):
         
         if local_hash != remote_hash:
             commit_msg = origin.refs.main.commit.message
+            banner_url = "https://github.com/darklord-end/Imagessss/blob/main/Update.png?raw=true"
             text = (
-                "🆕 **Доступно обновление!**\n\n"
-                f"**Коммит:** `{remote_hash[:7]}`\n"
-                f"**Описание:** `{commit_msg.strip()}`"
+                "🆕 <b> Доступно обновление!</b> \n"
+                f"<code>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</code>\n"
+                f"<b>Build:</b> <code>#{remote_hash[:7]}</code>\n"
+                f"<b>Описание:</b> <code>{commit_msg.strip()}</code>"
             )
-            await bot.send_message(chat_id, text, reply_markup=get_update_kb(), parse_mode="Markdown")
+            await bot.send_photo(
+                chat_id,
+                photo=banner_url,
+                caption=text,
+                reply_markup=get_update_kb(),
+                parse_mode="HTML"
+                )
             
             @dp.callback_query(F.data == "start_update")
             async def process_update(callback: types.CallbackQuery):

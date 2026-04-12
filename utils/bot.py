@@ -3,7 +3,8 @@ import aiohttp
 from db import Database
 from aiogram import Bot, Dispatcher, types
 from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.types import URLInputFile
+from aiogram.types import URLInputFile, BufferedInputFile
+import io
 import sys
 
 db = Database()
@@ -19,19 +20,26 @@ else:
 
 # Говно какоето из Bot Api 9.4 
 async def check_bot_pfp(target_bot=None):
-    current_bot = target_bot or bot 
+    current_bot = target_bot or bot
     if not current_bot: return
     
     try:
         me = await current_bot.get_me()
         chat = await current_bot.get_chat(me.id)
         
-        if not chat.photo:
-            print("[*] Авы нет")
-            pfp_url = "https://github.com/darklord-end/Imagessss/blob/main/Logo2.png?raw=true"
-            await bot.set_my_profile_photo(photo=URLInputFile(pfp_url))
-            print("[+] Аватарка поставлена")
+        print("[*] Авы нет, качаю в память и ставлю...")
+        pfp_url = "https://github.com/darklord-end/Imagessss/blob/main/Info.png?raw=true"
             
+        async with aiohttp.ClientSession() as sess:
+            async with sess.get(pfp_url) as resp:
+                if resp.status == 200:
+                     # Читаем картинку в байты прямо в оперативку
+                    data = await resp.read()
+                    # Создаем "виртуальный" файл из байтов
+                    input_file = BufferedInputFile(data, filename="pfp.png")
+                        
+                    await current_bot.set_my_profile_photo(photo=input_file)
+                    print("[+] Аватарка успешно установлена из памяти!")
     except Exception as e:
         print(f"[!] Ошибка pfp: {e}")
 
