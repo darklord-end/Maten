@@ -142,7 +142,8 @@ async def on_first_message(client, message):
         photo_url = "https://github.com/darklord-end/Imagessss/blob/main/omagad.png?raw=true" 
         try:
             await bot.send_photo(
-                me.id, 
+                db.get("main", "group_id"),
+                message_thread_id=db.get("main", "logs_topic_id"),
                 photo=photo_url, 
                 caption=caption, 
                 parse_mode="HTML",
@@ -191,5 +192,7 @@ if __name__ == "__main__":
                 os.remove("maten.session")
                 sys.exit(0)
         app.run()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(utils.create_group(app))
     except Exception as e:
         print(Fore.RED + f"[!] Maten не запущен. Ошибка: {e}")

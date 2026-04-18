@@ -17,7 +17,7 @@ async def create_group(client):
         CreateChannel(
             title="Maten",
             about="",
-            megagroup=True
+            megagroup=True,
         )
     )
     group_id = int(f"-100{channel.chats[0].id}")
@@ -52,7 +52,8 @@ async def create_group(client):
         elif hasattr(update, 'channel_id') and hasattr(update, 'topic_id'):
             topic_id = update.topic_id
             break
-
+    bot_id = Client.get_bot_info(db.get("system", "bot_username")).bot_id
+    await client.add_chat_members(group_id, bot_id)
     print(f"Найденный topic_id: {topic_id}")
     db.set("main", "group_id", group_id)
     db.set("main", "logs_topic_id", topic_id)

@@ -43,12 +43,22 @@ async def start_automation(app: Client):
         await send_with_delay("Maten...")
 
         token = None
-        async for message in app.get_chat_history(bot_father, limit=15):
-            if message.text:
-                match = re.search(r"(\d{8,10}:[A-Za-z0-9_-]{35})", message.text)
-                if match:
-                    token = match.group(1)
-                    break
+        try:
+            async for message in app.get_chat_history(bot_father, limit=15):
+                if "Sorry, you can't add more" in message.text:
+                    print("[!] Достигнут лимит ботов. Пожалуйста, удалите старые боты и попробуйте снова.")
+                    return
+                if message.text:
+                    match = re.search(r"(\d{8,10}:[A-Za-z0-9_-]{35})", message.text)
+                    if match:
+                        token = match.group(1)
+                        break
+        except TypeError as e:
+            if "'NoneType' object is not iterable" in str(e):
+                print("[!] Не удалось получить историю чата с BotFather. Проверьте подключение и права доступа.")
+                return
+            else:
+                raise
 
         if token:
             db.set("system", "bot_token", token)
