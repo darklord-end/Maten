@@ -3,6 +3,7 @@ import psutil
 import platform
 import sys
 import os
+import utils
 from pyrogram import Client, filters
 from datetime import datetime
 from git import Repo 
@@ -33,7 +34,7 @@ class Info:
             photo_url = "https://github.com/darklord-end/Imagessss/blob/main/Info.png?raw=true"
             
             caption = (
-                f"🔍 **Maten Userbot** `#{commit_hash}`\n"
+                f"🔍 **Maten Userbot** {utils.get_version()} `#{commit_hash}`\n"
                 f"───\n"
                 f"📂 **Core:** `Pyrofork {pyro_version}`\n"
                 f"🐍 **Python:** `{platform.python_version()}`\n"

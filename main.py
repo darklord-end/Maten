@@ -7,7 +7,6 @@ try:
     from pyrogram import Client
     from aiogram import Bot, Dispatcher
     from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-    import utils
     from db import Database
     import logging
     import loggering
@@ -22,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 uvloop.install()
 from aiogram.types import Message as AiogramMessage
+import utils
+
 config = open("config.ini", "r").read().split("\n")
 api_id = config[1].split(" = ")[1]
 api_hash = config[2].split(" = ")[1]
@@ -91,6 +92,7 @@ class LoaderMod:
                         print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
 
 class Basic:
+    version = (0, 1, 0)
     "TODO"
 
 init(autoreset=True)
@@ -127,7 +129,7 @@ async def on_first_message(client, message):
         me = await client.get_me()
         
         caption = (
-            f"<b>Maten UserBot</b>\n"
+            f"<b>Maten UserBot {utils.get_version()}</b>\n"
             f"<code>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</code>\n"
             f"<b>👤 User:</b> <code>{me.first_name}</code>\n"
             f"<b>🆔 ID:</b> <code>{me.id}</code>\n"
