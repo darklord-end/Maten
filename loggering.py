@@ -7,9 +7,15 @@ import asyncio
 import sys
 
 logger = logging.getLogger(__name__)
-config = open("config.ini", "r").read().split("\n")
-api_id = config[1].split(" = ")[1]
-api_hash = config[2].split(" = ")[1]
+api_id = None
+api_hash = None
+with open("config.ini", "r") as f:
+    for line in f:
+        line = line.strip()
+        if line.startswith("api_id"):
+            api_id = line.split(" = ")[1]
+        elif line.startswith("api_hash"):
+            api_hash = line.split(" = ")[1]
 app = None
 loop = None
 
@@ -53,14 +59,10 @@ class loggerhandler(logging.Handler):
             print(f"[LOG] {log_entry}")
             return
         try:
-            try:
-                current_loop = asyncio.get_running_loop()
-                asyncio.create_task(send_message(log_entry))
-            except RuntimeError:
-                if loop and loop.is_running():
-                    asyncio.run_coroutine_threadsafe(send_message(log_entry), loop)
-                else:
-                    print(f"[LOG] {log_entry}")
+            if loop and loop.is_running():
+                asyncio.run_coroutine_threadsafe(send_message(log_entry), loop)
+            else:
+                print(f"[LOG] {log_entry}")
         except Exception as e:
             print(f"Failed to send log: {e}")
             print(f"[LOG] {log_entry}")

@@ -56,6 +56,8 @@ class LoaderMod:
         import os
         from utils.config import config
         pref = config.prefix
+        modules_list1 = []
+        modules_list2 = []
         try:
             modules_list1 = os.listdir("modules")
             modules_list2 = os.listdir("loaded")
@@ -92,7 +94,7 @@ class LoaderMod:
                         print(Fore.RED + f"[!] Ошибка загрузки модуля {module_name}: {e}")
 
 class Basic:
-    version = (0, 1, 0)
+    version = (0, 1, 2)
     "TODO"
 
 init(autoreset=True)
@@ -141,22 +143,53 @@ async def on_first_message(client, message):
              InlineKeyboardButton(text="⚙️ Настройки", callback_data="settings", style='primary')]
         ])
 
+        import aiohttp
+        from aiogram.types import BufferedInputFile
         photo_url = "https://github.com/darklord-end/Imagessss/blob/main/omagad.png?raw=true" 
+        photo_data = None
         try:
-            await bot.send_photo(
-                db.get("main", "group_id"),
-                message_thread_id=db.get("main", "logs_topic_id"),
-                photo=photo_url, 
-                caption=caption, 
-                parse_mode="HTML",
-                reply_markup=kb
-            )
+            async with aiohttp.ClientSession() as sess:
+                async with sess.get(photo_url) as resp:
+                    if resp.status == 200:
+                        photo_data = BufferedInputFile(await resp.read(), filename="start.png")
         except Exception as e:
-            await bot.send_message(me.id, caption, parse_mode="HTML", reply_markup=kb)
+            print(Fore.RED + f"[!] Не удалось загрузить фото: {e}")
 
-            await utils.check_for_updates_aiogram(bot, me.id, dp)
+        if photo_data:
+            try:
+                await bot.send_photo(
+                    db.get("main", "group_id"),
+                    message_thread_id=db.get("main", "logs_topic_id"),
+                    photo=photo_data, 
+                    caption=caption, 
+                    parse_mode="HTML",
+                    reply_markup=kb
+                )
+            except Exception as e:
+                print(Fore.RED + f"[!] Не удалось отправить в группу: {e}")
+                try:
+                    await bot.send_photo(
+                        me.id,
+                        photo=photo_data,
+                        caption=caption,
+                        parse_mode="HTML",
+                        reply_markup=kb
+                    )
+                except Exception as e2:
+                    print(Fore.RED + f"[!] Не удалось отправить в ЛС: {e2}")
+        else:
+            try:
+                await bot.send_message(
+                    db.get("main", "group_id"),
+                    caption,
+                    parse_mode="HTML",
+                    reply_markup=kb
+                )
+            except:
+                await bot.send_message(me.id, caption, parse_mode="HTML", reply_markup=kb)
 
-            await utils.check_bot_pfp(bot)
+        await utils.check_for_updates_aiogram(bot, me.id, dp)
+        await utils.check_bot_pfp(bot)
 
 def restart():
     print(Fore.YELLOW + "[*] Перезапуск...")
@@ -176,7 +209,7 @@ if __name__ == "__main__":
         print(Fore.GREEN + f"[+] Maten запущен.")
         print(Fore.GREEN + f"{MATEN_ART}")
         print(Fore.CYAN + f"• Build: {short_sha}")
-        print(Fore.CYAN + f"• Version: ") # Дообавить потом реальную версию
+        print(Fore.CYAN + f"• Version: ") # utils.get_version() вызывает бесконечную загрузку, не знаю в чём причина
         print(Fore.CYAN + f"• Up-to-Date")
         loggering.load(app)
         logger.setLevel(logging.INFO)

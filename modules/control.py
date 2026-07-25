@@ -1,5 +1,6 @@
 from pyrogram import Client, filters
-import os, sys, time
+import os, sys
+import asyncio
 from utils.config import config
 
 class Control:
@@ -9,13 +10,13 @@ class Control:
         @app.on_message(filters.command("restart", prefixes=prefix) & filters.me)
         async def restart_handler(client, message):
             await message.edit("**🔄 Перезагрузка Maten...**")
-            time.sleep(1)
+            await asyncio.sleep(1)
             os.execl(sys.executable, sys.executable, *sys.argv)  
 
         @app.on_message(filters.command("shutdown", prefixes=prefix) & filters.me)
         async def shutdown_handler(client, message):
             await message.edit("**🛑 Завершение работы...**")
-            time.sleep(1)
+            await asyncio.sleep(1)
             sys.exit()
 
         # Префикс меняется только при перезагрузке

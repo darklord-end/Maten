@@ -1,6 +1,5 @@
-# Fun module | By: @DarkLord
 import random
-import time
+import asyncio
 from pyrogram import Client, filters
 
 class Random:
@@ -18,7 +17,7 @@ class Random:
             result = random.choice(choices)
 
             await message.edit(f"**🧐 Гадаю на:** `{question}`\n**Результат:** `⏳ Думаю...`")
-            time.sleep(1.5)
+            await asyncio.sleep(1.5)
 
             await message.edit(
                 f"**❓ Вопрос:** `{question}`\n"

@@ -1,6 +1,7 @@
 from pyrogram import Client
 from pyrogram.raw.functions.channels import ToggleForum, CreateChannel
 from pyrogram.raw.functions.messages import CreateForumTopic
+from pyrogram.raw.types.messages import ForumTopics
 from db import Database
 import time
 import logging
@@ -11,7 +12,7 @@ db = Database()
 
 async def create_group(client):
     if db.get("main", "group_id") is not None:
-        logger.info("Группа уже существует. ID:", db.get("main", "group_id"))
+        logger.info("Группа уже существует. ID: %s", db.get("main", "group_id"))
         return
     channel = await client.invoke(
         CreateChannel(
@@ -22,7 +23,7 @@ async def create_group(client):
     )
     group_id = int(f"-100{channel.chats[0].id}")
     group = await client.get_chat(group_id)
-    print(f"Группа '{group.title}' создана с ID: {group.id}")
+    logger.info("Группа '%s' создана с ID: %s", group.title, group.id)
     await client.invoke(
         ToggleForum(
             channel=await client.resolve_peer(group_id),
@@ -30,30 +31,36 @@ async def create_group(client):
             tabs=False,
         )
     )
-    print(f"Форум для группы '{group.title}' включен.")
+    logger.info("Форум для группы '%s' включен.", group.title)
     random_id = int(time.time() * 1000) % (2**63 - 1)
-    print(f"Генерируем random_id для топика: {random_id}")
     icon_colors = [0x6FB9F0, 0xFFD67E, 0xCB86DB, 0x8EEE98, 0xFF93B2, 0xFB6F5F]
     topic_result = await client.invoke(
         CreateForumTopic(
             peer=await client.resolve_peer(group_id),
             title="logs",
             random_id=random_id,
-            icon_color=icon_colors[0],  # голубой цвет
+            icon_color=icon_colors[0],
         )
     )
     topic_id = None
-    for update in topic_result.updates:
-        print(f"Update: {update}")
-        print(dir(update))
-        if hasattr(update, 'id'):
-            topic_id = update.id
-            break
-        elif hasattr(update, 'channel_id') and hasattr(update, 'topic_id'):
-            topic_id = update.topic_id
-            break
-    bot_id = Client.get_bot_info(db.get("system", "bot_username")).bot_id
-    await client.add_chat_members(group_id, bot_id)
-    print(f"Найденный topic_id: {topic_id}")
+    if isinstance(topic_result, ForumTopics):
+        if topic_result.topics:
+            topic_id = topic_result.topics[0].id
+    if topic_id is None:
+        for update in topic_result.updates:
+            if hasattr(update, 'id'):
+                topic_id = update.id
+                break
+            if hasattr(update, 'channel_id') and hasattr(update, 'topic_id'):
+                topic_id = update.topic_id
+                break
+    bot_username = db.get("system", "bot_username")
+    if bot_username:
+        try:
+            bot_info = await client.resolve_peer(bot_username)
+            await client.add_chat_members(group_id, bot_info.user_id)
+        except Exception as e:
+            logger.error("Не удалось добавить бота в группу: %s", e)
+    logger.info("Найденный topic_id: %s", topic_id)
     db.set("main", "group_id", group_id)
     db.set("main", "logs_topic_id", topic_id)
